@@ -54,23 +54,28 @@ jobs:
                 sudo systemctl enable docker
                 sudo usermod -aG docker $USER
             fi
-
-            echo "Pulling latest Docker image on EC2..."
-            docker pull amangoyal9643/truecallerbackendapp:latest
             
             echo "Stopping and removing old container..."
             docker stop node_app || true
             docker rm node_app || true
 
+                       echo "Navigating to project directory..."
+            cd /home/${{ secrets.EC2_USER }}
+
+            if [ -d "truecaller-backendapp" ]; then
+              echo "Repo already exists, pulling latest changes..."
+              cd truecaller-backendapp
+              git pull origin main
+            else
+              echo "Cloning repo..."
+              git clone https://github.com/Amangoyal1A/truecaller-backendapp.git
+              cd truecaller-backendapp
+            fi
+
+            echo "Stopping and removing old container..."
+            docker compose down || true
+
             echo "Running new container..."
-            docker run -d --name node_app \
-              -p 9000:9000 \
-              -e POSTGRES_DBNAME=postgres \
-              -e POSTGRES_USERNAME=postgres \
-              -e POSTGRES_PASSWORD=postgres \
-              -e POSTGRES_HOST=postgres \
-              -e SAMPLE_SECRET_JWT_KET=865955bd-7b4c-4f30-acbf-e7f62833fe10 \
-              --network host \
-              amangoyal9643/truecallerbackendapp:latest
+            docker compose up --build -d
 
             echo "Deployment completed!"
