@@ -1,10 +1,10 @@
-name: Docker Build and Push
+name: Docker Build, Push and Deploy to EC2
 
 on:
   push:
-    branches: [ "dev","main" ]
+    branches: [ "dev", "main" ]
   pull_request:
-    branches: [ "dev","main" ]
+    branches: [ "dev", "main" ]
 
 jobs:
   build-and-push:
@@ -13,11 +13,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: debug
-        run: |
-          echo "Username: ${{ secrets.DOCKER_HUB_USERNAME }}" 
-          echo "Password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" 
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -33,7 +28,39 @@ jobs:
           docker build -t amangoyal9643/truecallerbackendapp:latest .
           docker tag amangoyal9643/truecallerbackendapp:latest amangoyal9643/truecallerbackendapp:${{ github.sha }}
 
-      - name: Push Docker Image
+      - name: Push Docker Image to Docker Hub
         run: |
           docker push amangoyal9643/truecallerbackendapp:latest
           docker push amangoyal9643/truecallerbackendapp:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push  # Run only after the build-and-push job succeeds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Pulling latest Docker image on EC2..."
+            docker pull amangoyal9643/truecallerbackendapp:latest
+            
+            echo "Stopping and removing old container..."
+            docker stop node_app || true
+            docker rm node_app || true
+
+            echo "Running new container..."
+            docker run -d --name node_app \
+              -p 9000:9000 \
+              -e POSTGRES_DBNAME=postgres \
+              -e POSTGRES_USERNAME=postgres \
+              -e POSTGRES_PASSWORD=postgres \
+              -e POSTGRES_HOST=postgres \
+              -e SAMPLE_SECRET_JWT_KET=865955bd-7b4c-4f30-acbf-e7f62833fe10 \
+              --network host \
+              amangoyal9643/truecallerbackendapp:latest
+
+            echo "Deployment completed!"
