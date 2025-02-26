@@ -15,6 +15,7 @@ export class SequelizeConnection {
             appConfig.POSTGRES_PASSWORD,
             {
                 host: appConfig.POSTGRES_HOST,
+                port:  5432, 
                 dialect: "postgres",
                 pool: {
                     max: 25, //considering there are 4 pods running on prod, we want max 100 connections

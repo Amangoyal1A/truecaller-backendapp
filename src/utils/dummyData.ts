@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { Contact } from "../models/contact.model";
 import { User } from "../models/user.model";
 
