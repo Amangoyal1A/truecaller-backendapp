@@ -45,6 +45,16 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "Installing Docker if not installed..."
+            if ! command -v docker &> /dev/null
+            then
+                sudo apt update
+                sudo apt install -y docker.io
+                sudo systemctl start docker
+                sudo systemctl enable docker
+                sudo usermod -aG docker $USER
+            fi
+
             echo "Pulling latest Docker image on EC2..."
             docker pull amangoyal9643/truecallerbackendapp:latest
             
