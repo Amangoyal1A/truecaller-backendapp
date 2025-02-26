@@ -4,7 +4,7 @@ import Joi from "joi";
 const schema = Joi.object({
     name: Joi.string().required().messages({
         "string.empty": "name is required.",
-        "any.required": "name is a required field."
+        "any.required": "Name is a required field"
     }),
     phoneNumber: Joi.string()
         .pattern(/^[0-9]{10}$/)

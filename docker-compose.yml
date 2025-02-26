@@ -15,7 +15,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   app:
-    build: .
+    image: amangoyal9643/truecallerbackendapp:latest  # Using prebuilt Docker image
     container_name: node_app
     restart: always
     depends_on:
@@ -28,9 +28,6 @@ services:
       SAMPLE_SECRET_JWT_KET: "865955bd-7b4c-4f30-acbf-e7f62833fe10"
     ports:
       - "9000:9000"
-    volumes:
-      - .:/usr/src/app
-    command: ["npm", "run", "start"]  # Change this if needed
 
 volumes:
   postgres_data:

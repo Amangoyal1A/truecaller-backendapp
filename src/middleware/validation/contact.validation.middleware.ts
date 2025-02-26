@@ -6,7 +6,7 @@ import Joi from "joi";
 const schema = Joi.object({
     name: Joi.string().required().messages({
         "string.empty": "Name is required.",
-        "any.required": "name is a required field."
+        "any.required": "Name is a required field"
     }),
     phoneNumber: Joi.string()
         .pattern(/^[0-9]{10}$/)
@@ -14,7 +14,7 @@ const schema = Joi.object({
         .messages({
             "string.empty": "Phone number is required.",
             "string.pattern.base": "Phone number must be a 10-digit number.",
-            "any.required": "phoneNumber is a required field."
+            "any.required": "phoneNumber is a required field"
         }),
 });
 
