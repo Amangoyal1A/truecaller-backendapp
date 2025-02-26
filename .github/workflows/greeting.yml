@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Checkout Repository
+      - name: debug
         run: |
           echo "Username: ${{ secrets.DOCKER_HUB_USERNAME }}" 
           echo "Password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" 
